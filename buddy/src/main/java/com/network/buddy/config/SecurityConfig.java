@@ -23,6 +23,7 @@ public class SecurityConfig {
         return new InMemoryUserDetailsManager(user);
     }
 
+    // Default chain is gone
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 

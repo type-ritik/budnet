@@ -45,4 +45,5 @@ public class UserController {
         UserEntity user = userService.getUserById(id);
         return ResponseEntity.ok(user);
     }
+
 }
