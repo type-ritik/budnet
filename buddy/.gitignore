@@ -80,4 +80,4 @@ logs/
 *.tmp
 *.temp
 *.swp
-/src/main/resources/application.properties
+**/src/main/resources/application.properties
