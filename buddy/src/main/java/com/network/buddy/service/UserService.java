@@ -44,6 +44,23 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public UserEntity userLogin(UserEntity user) {
+        boolean userExists = userRepository.existsByEmail(user.getEmail());
+
+        if (!userExists) {
+            throw new IllegalArgumentException("User with email address doesn't exists.");
+        }
+
+        UserEntity userEntity = userRepository.findByEmail(user.getEmail()).get();
+        boolean passwordMatches = passwordEncoder.matches(user.getPassword(), userEntity.getPassword());
+
+        if (passwordMatches) {
+            return userEntity;
+        } else {
+            throw new IllegalArgumentException("Invalid login credentials.");
+        }
+    }
+
     public UserEntity getUserById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found."));
     }

@@ -6,13 +6,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.network.buddy.model.UserEntity;
 import com.network.buddy.repository.UserRepository;
 import com.network.buddy.service.UserService;
-
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,6 +33,7 @@ public class UserController {
     public ResponseEntity<UserEntity> createUser(@RequestBody UserEntity user) {
 
         UserEntity savedUser = userService.createuser(user);
+        System.out.println("Signup successful!");
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 
@@ -44,6 +41,13 @@ public class UserController {
     public ResponseEntity<UserEntity> getUser(@PathVariable Long id) {
         UserEntity user = userService.getUserById(id);
         return ResponseEntity.ok(user);
+    }
+
+    @PostMapping("/auth/user/login")
+    public ResponseEntity<UserEntity> loginUser(@RequestBody UserEntity user) {
+        UserEntity logUser = userService.userLogin(user);
+        System.out.println("Login successful!");
+        return ResponseEntity.status(HttpStatus.CREATED).body(logUser);
     }
 
 }
