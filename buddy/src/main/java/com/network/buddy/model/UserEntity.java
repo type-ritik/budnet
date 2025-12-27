@@ -22,12 +22,10 @@ public class UserEntity {
 
     private String password;
 
+    private String role;
+
     public void setPassword(String _password) {
         this.password = _password;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public void setName(String _name) {
@@ -40,6 +38,10 @@ public class UserEntity {
 
     public void setUsername(String _username) {
         this.username = _username;
+    }
+
+    public void setRole(String _role) {
+        this.role = _role;
     }
 
     public Long getId() {
@@ -57,4 +59,13 @@ public class UserEntity {
     public String getEmail() {
         return email;
     }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
 }
