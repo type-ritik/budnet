@@ -3,10 +3,12 @@ package com.network.buddy.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.network.buddy.dto.AuthenticateUserRequest;
+import com.network.buddy.dto.AuthenticateUserResponse;
+import com.network.buddy.dto.RegisterUserRequest;
+import com.network.buddy.dto.RegisterUserResponse;
 import com.network.buddy.model.UserEntity;
-import com.network.buddy.repository.UserRepository;
 import com.network.buddy.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,38 +18,43 @@ import org.springframework.web.bind.annotation.PathVariable;
 // import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/auth/v1")
 public class UserController {
-
-    @Autowired
-    private final UserRepository userRepository;
 
     private final UserService userService;
 
-    public UserController(UserService _userService, UserRepository userRepository) {
+    public UserController(UserService _userService) {
         this.userService = _userService;
-        this.userRepository = userRepository;
     }
 
-    @PostMapping("/auth/user/signup")
-    public ResponseEntity<UserEntity> createUser(@RequestBody UserEntity user) {
+    @PostMapping("/signup")
+    public ResponseEntity<?> signup(@RequestBody RegisterUserRequest request) {
+        try {
+            RegisterUserResponse response = userService.registerUser(request);
+            System.out.println("Signup successful!");
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getLocalizedMessage());
+        }
 
-        UserEntity savedUser = userService.createuser(user);
-        System.out.println("Signup successful!");
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 
-    @GetMapping("/get/user/{id}")
+    @GetMapping("user/{id}")
     public ResponseEntity<UserEntity> getUser(@PathVariable Long id) {
         UserEntity user = userService.getUserById(id);
         return ResponseEntity.ok(user);
     }
 
-    @PostMapping("/auth/user/login")
-    public ResponseEntity<UserEntity> loginUser(@RequestBody UserEntity user) {
-        UserEntity logUser = userService.userLogin(user);
-        System.out.println("Login successful!");
-        return ResponseEntity.status(HttpStatus.CREATED).body(logUser);
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody AuthenticateUserRequest request) {
+        try {
+
+            AuthenticateUserResponse response = userService.authenticateUser(request);
+            System.out.println("Login successful!");
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getLocalizedMessage());
+        }
     }
 
 }
