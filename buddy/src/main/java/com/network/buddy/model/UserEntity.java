@@ -25,7 +25,7 @@ public class UserEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
-    private Long id;
+    private String id;
 
     @Column(nullable = false)
     private String name;
@@ -43,7 +43,7 @@ public class UserEntity implements UserDetails {
     private String role;
 
     @CreationTimestamp
-    @Column(updatable = false, name = "createdAt")
+    @Column(updatable = false, name = "created_at")
     private Date createdAt;
 
     public UserEntity(RegisterUserRequest signupRequest) {
@@ -106,7 +106,7 @@ public class UserEntity implements UserDetails {
         this.role = _role;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
