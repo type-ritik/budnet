@@ -21,9 +21,9 @@ import io.jsonwebtoken.security.Keys;
 public class JwtService {
 
     // Environment data import
-    @Value("$application.security.jwt.secret-key}")
+    @Value("${application.security.jwt.secret-key}")
     private String SEC_KEY;
-    @Value("$application.security.jwt.expiration}")
+    @Value("${application.security.jwt.expiration}")
     private long expiration;
 
     private Key getSignKey() {
@@ -58,7 +58,7 @@ public class JwtService {
         return createToken(claims, user.getUsername());
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
+    public Boolean isTokenValide(String token, UserDetails userDetails) {
         Date expireDate = extractExpiration(token);
         if (expireDate.before(new Date())) {
             return false;
