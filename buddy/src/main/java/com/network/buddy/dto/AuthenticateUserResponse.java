@@ -1,9 +1,11 @@
 package com.network.buddy.dto;
 
+import java.util.UUID;
+
 import com.network.buddy.model.UserEntity;
 
 public record AuthenticateUserResponse(
-        String id,
+        UUID id,
         String username,
         String name,
         String email,
