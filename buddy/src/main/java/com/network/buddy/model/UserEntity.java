@@ -3,9 +3,11 @@ package com.network.buddy.model;
 import java.sql.Date;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.network.buddy.dto.AuthenticateUserRequest;
@@ -13,6 +15,8 @@ import com.network.buddy.dto.RegisterUserRequest;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,22 +29,22 @@ public class UserEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
-    private String id;
+    private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 25)
     private String name;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 20)
     private String username;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 40)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 80)
     private String password;
 
-    @Column(nullable = false)
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @CreationTimestamp
     @Column(updatable = false, name = "created_at")
@@ -63,7 +67,7 @@ public class UserEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(() -> getRole());
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     @Override
@@ -102,11 +106,11 @@ public class UserEntity implements UserDetails {
         this.username = _username;
     }
 
-    public void setRole(String _role) {
+    public void setRole(Role _role) {
         this.role = _role;
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
@@ -126,8 +130,8 @@ public class UserEntity implements UserDetails {
         return password;
     }
 
-    public String getRole() {
-        return role;
+    public Role getRole() {
+        return this.role;
     }
 
 }
