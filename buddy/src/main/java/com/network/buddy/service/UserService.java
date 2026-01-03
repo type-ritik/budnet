@@ -1,5 +1,7 @@
 package com.network.buddy.service;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -8,6 +10,7 @@ import com.network.buddy.dto.AuthenticateUserRequest;
 import com.network.buddy.dto.AuthenticateUserResponse;
 import com.network.buddy.dto.RegisterUserRequest;
 import com.network.buddy.dto.RegisterUserResponse;
+import com.network.buddy.model.Role;
 import com.network.buddy.model.UserEntity;
 import com.network.buddy.repository.UserRepository;
 
@@ -63,6 +66,7 @@ public class UserService {
         newUser.setUsername(user.username());
         newUser.setName(user.name());
         newUser.setPassword(passwordEncoder.encode(user.password()));
+        newUser.setRole(Role.USER);
 
         UserEntity savedUser = userRepository.save(newUser);
 
@@ -111,7 +115,7 @@ public class UserService {
 
     }
 
-    public UserEntity getUserById(String id) {
+    public UserEntity getUserById(UUID id) {
         return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found."));
     }
 

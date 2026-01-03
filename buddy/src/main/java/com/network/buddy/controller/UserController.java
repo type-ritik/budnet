@@ -13,6 +13,8 @@ import com.network.buddy.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.UUID;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,7 +50,8 @@ public class UserController {
 
     @GetMapping("user/{id}")
     public ResponseEntity<?> getUser(@PathVariable String id) {
-        UserEntity user = userService.getUserById(id);
+        UUID uid = UUID.fromString(id);
+        UserEntity user = userService.getUserById(uid);
         return ResponseEntity.ok(user);
     }
 
