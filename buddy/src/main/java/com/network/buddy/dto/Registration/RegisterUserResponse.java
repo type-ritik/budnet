@@ -1,4 +1,4 @@
-package com.network.buddy.dto;
+package com.network.buddy.dto.Registration;
 
 import java.util.UUID;
 
