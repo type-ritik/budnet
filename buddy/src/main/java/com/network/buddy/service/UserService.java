@@ -6,10 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.network.buddy.dto.AuthenticateUserRequest;
-import com.network.buddy.dto.AuthenticateUserResponse;
-import com.network.buddy.dto.RegisterUserRequest;
-import com.network.buddy.dto.RegisterUserResponse;
+import com.network.buddy.dto.Authentication.AuthenticateUserRequest;
+import com.network.buddy.dto.Authentication.AuthenticateUserResponse;
+import com.network.buddy.dto.Registration.RegisterUserRequest;
+import com.network.buddy.dto.Registration.RegisterUserResponse;
 import com.network.buddy.model.Role;
 import com.network.buddy.model.UserEntity;
 import com.network.buddy.repository.UserRepository;

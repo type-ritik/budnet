@@ -10,8 +10,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.network.buddy.dto.AuthenticateUserRequest;
-import com.network.buddy.dto.RegisterUserRequest;
+import com.network.buddy.dto.Authentication.AuthenticateUserRequest;
+import com.network.buddy.dto.Registration.RegisterUserRequest;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

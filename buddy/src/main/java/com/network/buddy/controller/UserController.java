@@ -3,10 +3,10 @@ package com.network.buddy.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.network.buddy.dto.AuthenticateUserRequest;
-import com.network.buddy.dto.AuthenticateUserResponse;
-import com.network.buddy.dto.RegisterUserRequest;
-import com.network.buddy.dto.RegisterUserResponse;
+import com.network.buddy.dto.Authentication.AuthenticateUserRequest;
+import com.network.buddy.dto.Authentication.AuthenticateUserResponse;
+import com.network.buddy.dto.Registration.RegisterUserRequest;
+import com.network.buddy.dto.Registration.RegisterUserResponse;
 import com.network.buddy.model.UserEntity;
 import com.network.buddy.service.UserService;
 
