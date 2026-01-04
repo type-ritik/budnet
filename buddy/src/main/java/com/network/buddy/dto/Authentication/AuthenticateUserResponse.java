@@ -1,4 +1,4 @@
-package com.network.buddy.dto;
+package com.network.buddy.dto.Authentication;
 
 import java.util.UUID;
 
