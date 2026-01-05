@@ -2,12 +2,12 @@ package com.network.buddy.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.network.buddy.dto.CreatePost.CreatePostRequest;
 import com.network.buddy.dto.CreatePost.CreatePostResponse;
 import com.network.buddy.model.PostEntity;
 import com.network.buddy.repository.PostRepository;
-
+import com.network.buddy.utils.exception.ResourceNotFoundException;
+import com.network.buddy.utils.exception.ResponseNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -26,12 +26,12 @@ public class PostService {
 
         // business rule here...
         if (post.title() == null || post.title().isBlank()) {
-            throw new IllegalArgumentException("Post title is required");
+            throw new ResourceNotFoundException("Post title is required");
         }
         log.info("Valid post title");
 
         if (post.content() == null) {
-            throw new IllegalArgumentException("Post content is required");
+            throw new ResourceNotFoundException("Post content is required");
         }
 
         log.info("Valid post content");
@@ -44,11 +44,15 @@ public class PostService {
         log.info("Entity is created: " + newPost.toString());
 
         // Additional business rules can be added here
-        PostEntity savedPost = postRepository.save(newPost);
-        CreatePostResponse response = new CreatePostResponse(savedPost);
-
-        log.info("PostCreated: " + response.toString());
-        log.info("Post created successfully");
-        return response;
+        try {
+            PostEntity savedPost = postRepository.save(newPost);
+            CreatePostResponse response = new CreatePostResponse(savedPost);
+            log.info("PostCreated: " + response.toString());
+            log.info("Post created successfully");
+            return response;
+        } catch (ResponseNotFoundException e) {
+            log.error("Error while creating post: " + e.getMessage());
+            throw new ResponseNotFoundException("Failed to create post");
+        }
     }
 }

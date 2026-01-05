@@ -5,7 +5,6 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import com.network.buddy.dto.Authentication.AuthenticateUserRequest;
 import com.network.buddy.dto.Authentication.AuthenticateUserResponse;
 import com.network.buddy.dto.Registration.RegisterUserRequest;
@@ -13,7 +12,9 @@ import com.network.buddy.dto.Registration.RegisterUserResponse;
 import com.network.buddy.model.Role;
 import com.network.buddy.model.UserEntity;
 import com.network.buddy.repository.UserRepository;
-
+import com.network.buddy.utils.exception.ResourceNotFoundException;
+import com.network.buddy.utils.exception.ResponseNotFoundException;
+import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -41,22 +42,22 @@ public class UserService {
 
         // business rule here...
         if (user.email() == null) {
-            throw new IllegalArgumentException("Email is required");
+            throw new ResourceNotFoundException("Email is required");
         }
         log.info("Valid email");
 
         if (user.password() == null) {
-            throw new IllegalArgumentException("Password is required");
+            throw new ResourceNotFoundException("Password is required");
         }
 
         if (user.password().length() < 8) {
-            throw new IllegalArgumentException("Password length must be greater than 8");
+            throw new ResourceNotFoundException("Password length must be greater than 8");
         }
 
         log.info("Valid password");
 
         if (user.username().length() < 3) {
-            throw new IllegalArgumentException("Username length must be greater than 3");
+            throw new ResourceNotFoundException("Username length must be greater than 3");
         }
 
         log.info("Valid username");
@@ -68,20 +69,25 @@ public class UserService {
         newUser.setPassword(passwordEncoder.encode(user.password()));
         newUser.setRole(Role.USER);
 
-        UserEntity savedUser = userRepository.save(newUser);
+        try {
 
-        log.info("Save user data in table");
+            UserEntity savedUser = userRepository.save(newUser);
 
-        String token = jwtService.generateToken(savedUser);
+            log.info("Save user data in table");
 
-        log.info("Generate token: " + token);
+            String token = jwtService.generateToken(savedUser);
 
-        RegisterUserResponse response = new RegisterUserResponse(savedUser, token);
+            log.info("Generate token: " + token);
 
-        log.info("Response is created: " + response.toString());
-        log.info("User Registered Successfully");
+            RegisterUserResponse response = new RegisterUserResponse(savedUser, token);
 
-        return response;
+            log.info("Response is created: " + response.toString());
+            log.info("User Registered Successfully");
+
+            return response;
+        } catch (ResponseNotFoundException e) {
+            throw new ResponseNotFoundException("Server error");
+        }
     }
 
     public AuthenticateUserResponse authenticateUser(AuthenticateUserRequest user) {
@@ -89,7 +95,7 @@ public class UserService {
         boolean userExists = userRepository.existsByEmail(user.email());
 
         if (!userExists) {
-            throw new IllegalArgumentException("User with email address doesn't exists.");
+            throw new ResourceNotFoundException("User with email address doesn't exists.");
         }
         log.info("User Exists");
 
@@ -100,35 +106,49 @@ public class UserService {
         log.info("Password matching start");
 
         if (!passwordMatches) {
-            throw new IllegalArgumentException("Invalid login credentials.");
+            throw new ResourceNotFoundException("Invalid login credentials.");
         }
         log.info("Password matched");
 
         String token = jwtService.generateToken(userEntity);
         log.info("Token generated");
 
-        log.info("Response is creating");
-        AuthenticateUserResponse response = new AuthenticateUserResponse(userEntity, token);
-        log.info("Authentication Successfull");
+        if (token == null) {
+            throw new ResourceNotFoundException("Error occurred while generating token.");
+        }
 
-        return response;
+        try {
+
+            log.info("Response is creating");
+            AuthenticateUserResponse response = new AuthenticateUserResponse(userEntity, token);
+            log.info("Authentication Successfull");
+            return response;
+        } catch (ResponseNotFoundException e) {
+            throw new ResponseNotFoundException("Server error");
+        }
 
     }
 
     public UserEntity getUserById(UUID id) {
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found."));
+        try {
+
+            return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found."));
+        } catch (JwtException e) {
+            throw new JwtException("Error: " + e.getLocalizedMessage());
+        }
     }
 
     public UserEntity loadUserByUsername(String username) {
         if (username.length() < 3) {
-            throw new IllegalArgumentException("Username must be at least 3 Character long.");
+            throw new ResourceNotFoundException("Username must be at least 3 Character long.");
         }
-        UserEntity user = userRepository.findByUsername(username);
+        try {
 
-        if (user.getName() == null) {
-            throw new IllegalArgumentException("User not found with username: " + username);
+            UserEntity user = userRepository.findByUsername(username);
+            return user;
+        } catch (ResponseNotFoundException e) {
+            throw new ResponseNotFoundException("Server error");
         }
 
-        return user;
     }
 }
