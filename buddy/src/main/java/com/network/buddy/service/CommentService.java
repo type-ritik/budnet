@@ -90,4 +90,33 @@ public class CommentService {
 
     }
 
+    public List<ReadCommentResponse> retrieveAllCommentsByUserIdInPostId(UUID userId, UUID postId) {
+        log.info("Hit the Service");
+        if (!(userId.toString().length() < 37 && userId.toString().length() > 35)) {
+            log.error("Invalid UUID format for userId: {}", userId);
+            throw new ResourceNotFoundException("Invalid UUID format for userId");
+        }
+
+        if (!(postId.toString().length() < 37 && postId.toString().length() > 35)) {
+            log.error("Invalid UUID format for postId: {}", postId);
+            throw new ResourceNotFoundException("Invalid UUID format for postId");
+        }
+
+        try {
+            List<CommentEntity> payload = commentRepository.findManyCommentByAuthorIdAndPostId(userId, postId);
+
+            if (payload.isEmpty()) {
+                log.error("No comments found for userId: {} in postId: {}", userId, postId);
+                throw new ResourceNotFoundException("No comments found for the given userId in the specified postId");
+            }
+
+            List<ReadCommentResponse> responses = payload.stream().map(ReadCommentResponse::new).toList();
+
+            return responses;
+        } catch (IllegalArgumentException e) {
+            log.error("Error while retrieving comments: {}", e.getMessage());
+            throw new ResponseNotFoundException("Failed to retrieve comments");
+        }
+    }
+
 }
