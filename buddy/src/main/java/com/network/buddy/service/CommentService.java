@@ -1,10 +1,14 @@
 package com.network.buddy.service;
 
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.network.buddy.dto.Comment.CreateCommentRequest;
 import com.network.buddy.dto.Comment.CreateCommentResponse;
+import com.network.buddy.dto.ReadComment.ReadCommentResponse;
 import com.network.buddy.model.CommentEntity;
 import com.network.buddy.repository.CommentRepository;
 import com.network.buddy.utils.exception.ResourceNotFoundException;
@@ -58,6 +62,30 @@ public class CommentService {
             throw new ResponseNotFoundException("Server error");
         } catch (IllegalArgumentException e) {
             throw new ResourceNotFoundException("Invalid comment data provided");
+        }
+    }
+
+    public List<ReadCommentResponse> retrieveAllCommentsByUserId(UUID userId) {
+        if (!(userId.toString().length() < 37 && userId.toString().length() > 35)) {
+            log.error("Invalid UUID format for userId: {}", userId);
+            throw new ResourceNotFoundException("Invalid UUID format for userId");
+        }
+
+        log.info("Hit the service of comments");
+
+        try {
+            List<CommentEntity> payload = commentRepository.findManyCommentByAuthorId(userId);
+
+            List<ReadCommentResponse> response = payload.stream().map(ReadCommentResponse::new).toList();
+            if (response.isEmpty()) {
+                log.error("No comments found for userId: {}", userId);
+                throw new ResourceNotFoundException("No comments found for the given userId");
+            }
+            log.info("Comment retrieval successful");
+            return response;
+        } catch (IllegalArgumentException e) {
+            log.error("Error while retrieving comments: {}", e.getMessage());
+            throw new ResponseNotFoundException("Failed to retrieve comments");
         }
 
     }
