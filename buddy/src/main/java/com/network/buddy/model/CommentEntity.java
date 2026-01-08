@@ -2,16 +2,16 @@ package com.network.buddy.model;
 
 import java.util.Date;
 import java.util.UUID;
-
 import org.hibernate.annotations.CreationTimestamp;
-
 import com.network.buddy.dto.Comment.CreateCommentRequest;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -23,11 +23,8 @@ public class CommentEntity {
     @Column(nullable = false)
     private UUID id;
 
-    @Column(nullable = false, name = "author_id")
+    @Column(name = "author_id")
     private UUID authorId;
-
-    @Column(nullable = false, name = "post_id")
-    private UUID postId;
 
     @Column(name = "parent_comment_id")
     private UUID parentCommentId;
@@ -39,14 +36,18 @@ public class CommentEntity {
     @Column(nullable = false, name = "commented_at")
     private Date commentedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
+    private PostEntity posts;
+
     // Constructor
     public CommentEntity() {
     }
 
-    public CommentEntity(CreateCommentRequest request) {
+    public CommentEntity(CreateCommentRequest request, PostEntity... post) {
         this.authorId = request.authorId();
-        this.postId = request.postId();
         this.comment = request.comment();
+        this.posts = post.length > 0 ? post[0] : null;
     }
 
     // Setters
@@ -56,7 +57,7 @@ public class CommentEntity {
     }
 
     public void setPostId(UUID _postId) {
-        this.postId = _postId;
+        this.posts.setId(_postId);
     }
 
     public void setParentCommentId(UUID _parentCommentId) {
@@ -81,7 +82,7 @@ public class CommentEntity {
     }
 
     public UUID getPostId() {
-        return postId;
+        return posts.getId();
     }
 
     public UUID getParentCommentId() {
@@ -94,5 +95,9 @@ public class CommentEntity {
 
     public Date getCommentedAt() {
         return commentedAt;
+    }
+
+    public String getPostTitle() {
+        return posts.getTitle();
     }
 }

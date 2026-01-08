@@ -1,6 +1,7 @@
 package com.network.buddy.model;
 
 import java.sql.Date;
+import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -12,6 +13,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -36,6 +38,9 @@ public class PostEntity {
     @Column(nullable = false, name = "written_at")
     private Date writtenAt;
 
+    @OneToMany(mappedBy = "posts")
+    private List<CommentEntity> comments;
+
     public PostEntity(CreatePostResponse post) {
         this.title = post.title();
         this.content = post.content();
@@ -47,6 +52,10 @@ public class PostEntity {
 
     public void setTitle(String _title) {
         this.title = _title;
+    }
+
+    public void setId(UUID _id) {
+        this.id = _id;
     }
 
     public void setContent(String _content) {
