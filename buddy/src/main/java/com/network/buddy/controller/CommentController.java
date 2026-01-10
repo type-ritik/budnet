@@ -42,7 +42,7 @@ public class CommentController {
 
     }
 
-    @GetMapping("/post/comments/user/{userId}")
+    @GetMapping("/user/{userId}/comments")
     public ResponseEntity<ApiResponse<List<ReadCommentResponse>>> allCommentsByUserId(@PathVariable UUID userId) {
         log.info("Successfully retrieved userId");
         List<ReadCommentResponse> response = commentService.retrieveAllCommentsByUserId(userId);
@@ -51,7 +51,7 @@ public class CommentController {
 
     }
 
-    @GetMapping("/post/{postId}/user/{userId}")
+    @GetMapping("/user/{userId}/post/{postId}/comments")
     public ResponseEntity<ApiResponse<List<ReadCommentResponse>>> allCommentsByUserIdInPostId(@PathVariable UUID userId,
             @PathVariable UUID postId) {
         log.info("Successfully retrieved userId and postId");

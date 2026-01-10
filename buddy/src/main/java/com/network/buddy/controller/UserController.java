@@ -41,7 +41,7 @@ public class UserController {
 
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/user/{id}")
     public ResponseEntity<ApiResponse<UserEntity>> getUser(@PathVariable String id) {
 
         UUID uid = UUID.fromString(id);
