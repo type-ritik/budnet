@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/public/v1/post/comment")
+@RequestMapping("/api/v1")
 public class CommentController {
 
     private final CommentService commentService;
@@ -32,7 +32,7 @@ public class CommentController {
         this.commentService = _commentService;
     }
 
-    @PostMapping("/create")
+    @PostMapping("/comments")
     public ResponseEntity<ApiResponse<CreateCommentResponse>> createComment(
             @Valid @RequestBody CreateCommentRequest request) {
         log.info("Create comment API hit");
@@ -42,7 +42,7 @@ public class CommentController {
 
     }
 
-    @GetMapping("/by/user/{userId}")
+    @GetMapping("/post/comments/user/{userId}")
     public ResponseEntity<ApiResponse<List<ReadCommentResponse>>> allCommentsByUserId(@PathVariable UUID userId) {
         log.info("Successfully retrieved userId");
         List<ReadCommentResponse> response = commentService.retrieveAllCommentsByUserId(userId);
@@ -51,7 +51,7 @@ public class CommentController {
 
     }
 
-    @GetMapping("by/user-post/{userId}/{postId}")
+    @GetMapping("/post/{postId}/user/{userId}")
     public ResponseEntity<ApiResponse<List<ReadCommentResponse>>> allCommentsByUserIdInPostId(@PathVariable UUID userId,
             @PathVariable UUID postId) {
         log.info("Successfully retrieved userId and postId");
