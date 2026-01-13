@@ -14,6 +14,8 @@ import com.network.buddy.model.UserEntity;
 import com.network.buddy.repository.UserRepository;
 import com.network.buddy.utils.exception.ResourceNotFoundException;
 import com.network.buddy.utils.exception.ResponseNotFoundException;
+import com.network.buddy.utils.helper.UserValidationUtil;
+
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,30 +40,29 @@ public class UserService {
 
     public RegisterUserResponse registerUser(RegisterUserRequest user) {
 
-        log.info("User registration start");
-
         // business rule here...
-        if (user.email() == null) {
-            throw new ResourceNotFoundException("Email is required");
-        }
-        log.info("Valid email");
 
-        if (user.password() == null) {
-            throw new ResourceNotFoundException("Password is required");
+        // Email validation
+        if (UserValidationUtil.validateEmail(user.email())) {
+            log.info("Email validated");
         }
 
-        if (user.password().length() < 8) {
-            throw new ResourceNotFoundException("Password length must be greater than 8");
+        // Name validation
+        if (UserValidationUtil.validateName(user.name())) {
+            log.info("Name validated");
         }
 
-        log.info("Valid password");
-
-        if (user.username().length() < 3) {
-            throw new ResourceNotFoundException("Username length must be greater than 3");
+        // Username validation
+        if (UserValidationUtil.validateUsername(user.username())) {
+            log.info("Username validated");
         }
 
-        log.info("Valid username");
+        // Password validation
+        if (UserValidationUtil.validatePassword(user.password())) {
+            log.info("Password validated");
+        }
 
+        // User entity
         UserEntity newUser = new UserEntity();
         newUser.setEmail(user.email());
         newUser.setUsername(user.username());
@@ -71,19 +72,27 @@ public class UserService {
 
         try {
 
+            // Save user entity
             UserEntity savedUser = userRepository.save(newUser);
 
             log.info("Save user data in table");
 
+            // Generate token
             String token = jwtService.generateToken(savedUser);
 
-            log.info("Generate token: " + token);
+            // Error token generate
+            if (token == null) {
+                throw new ResourceNotFoundException("Error occurred while generating token.");
+            }
 
+            log.info("Generate token");
+
+            // Create response
             RegisterUserResponse response = new RegisterUserResponse(savedUser, token);
 
-            log.info("Response is created: " + response.toString());
             log.info("User Registered Successfully");
 
+            // Response
             return response;
         } catch (ResponseNotFoundException e) {
             throw new ResponseNotFoundException("Server error");
@@ -91,28 +100,38 @@ public class UserService {
     }
 
     public AuthenticateUserResponse authenticateUser(AuthenticateUserRequest user) {
-        log.info("Authentication start");
-        boolean userExists = userRepository.existsByEmail(user.email());
 
-        if (!userExists) {
+        // Email validation
+        if (UserValidationUtil.validateEmail(user.email())) {
+            log.info("Email validated");
+        }
+
+        // Password validation
+        if (UserValidationUtil.validatePassword(user.password())) {
+            log.info("Password validated");
+        }
+
+        // Email exists
+        if (!userRepository.existsByEmail(user.email())) {
             throw new ResourceNotFoundException("User with email address doesn't exists.");
         }
         log.info("User Exists");
 
+        // Retrieve payload
         UserEntity userEntity = userRepository.findByEmail(user.email());
         log.info("Retrive DB user data");
 
-        boolean passwordMatches = passwordEncoder.matches(user.password(), userEntity.getPassword());
-        log.info("Password matching start");
-
-        if (!passwordMatches) {
+        // Source of truth
+        if (!passwordEncoder.matches(user.password(), userEntity.getPassword())) {
             throw new ResourceNotFoundException("Invalid login credentials.");
         }
         log.info("Password matched");
 
+        // Generate token
         String token = jwtService.generateToken(userEntity);
         log.info("Token generated");
 
+        // Error token generate
         if (token == null) {
             throw new ResourceNotFoundException("Error occurred while generating token.");
         }
@@ -120,8 +139,11 @@ public class UserService {
         try {
 
             log.info("Response is creating");
+            // Create response
             AuthenticateUserResponse response = new AuthenticateUserResponse(userEntity, token);
             log.info("Authentication Successfull");
+
+            // Response
             return response;
         } catch (ResponseNotFoundException e) {
             throw new ResponseNotFoundException("Server error");
@@ -130,8 +152,14 @@ public class UserService {
     }
 
     public UserEntity getUserById(UUID id) {
+        // UUID validation
+        if (UserValidationUtil.validateUUID(id)) {
+            log.info("UUID validated");
+        }
+
         try {
 
+            // Search user by UUID
             return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found."));
         } catch (JwtException e) {
             throw new JwtException("Error: " + e.getLocalizedMessage());
@@ -139,12 +167,15 @@ public class UserService {
     }
 
     public UserEntity loadUserByUsername(String username) {
-        if (username.length() < 3) {
-            throw new ResourceNotFoundException("Username must be at least 3 Character long.");
+        if (UserValidationUtil.validateUsername(username)) {
+            log.info("Username validated");
         }
         try {
 
+            // Search user by username
             UserEntity user = userRepository.findByUsername(username);
+
+            // Response
             return user;
         } catch (ResponseNotFoundException e) {
             throw new ResponseNotFoundException("Server error");

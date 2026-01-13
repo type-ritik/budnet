@@ -34,7 +34,6 @@ public class UserController {
     @PostMapping("/auth/signup")
     public ResponseEntity<ApiResponse<RegisterUserResponse>> signup(@Valid @RequestBody RegisterUserRequest request) {
         log.info("Signup component hit");
-        log.info("Request info: " + request.toString());
         RegisterUserResponse response = userService.registerUser(request);
         log.info("Signup component end");
         return ResponseEntity.ok(ResponseUtil.success(response, "Welcome " + response.name(), "/"));
