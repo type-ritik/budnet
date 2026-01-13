@@ -29,12 +29,12 @@ public class PostService {
         log.info("Creating a new post");
 
         // business rule here...
-        if (post.title() == null || post.title().isBlank()) {
+        if (post.title().isEmpty()) {
             throw new ResourceNotFoundException("Post title is required");
         }
         log.info("Valid post title");
 
-        if (post.content() == null) {
+        if (post.content().isEmpty()) {
             throw new ResourceNotFoundException("Post content is required");
         }
 
