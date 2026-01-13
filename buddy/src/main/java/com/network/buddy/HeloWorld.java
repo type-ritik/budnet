@@ -2,14 +2,20 @@ package com.network.buddy;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 public class HeloWorld {
 
     @GetMapping("/")
-    public String getMethodName(@RequestParam String param) {
-        return new String("Hello World!");
+    public String home() {
+        return new String(
+                "<div style='display:block'><h1>Hello World!</h1><h2>Welcome @type_ritik</h2></div>");
+    }
+
+    @GetMapping("/health")
+    public String health() {
+        return new String(
+                "<div style='display:block'><h1>Hello World!</h1><h2>Welcome to health Check</h2></div>");
     }
 
 }
