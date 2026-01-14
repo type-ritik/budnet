@@ -13,6 +13,8 @@ import com.network.buddy.utils.ResponseUtil;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import java.util.UUID;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,15 +38,15 @@ public class UserController {
         log.info("Signup component hit");
         RegisterUserResponse response = userService.registerUser(request);
         log.info("Signup component end");
-        return ResponseEntity.ok(ResponseUtil.success(response, "Welcome " + response.name(), "/"));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ResponseUtil.success(response, "Welcome " + response.name(), "/"));
 
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<ApiResponse<UserEntity>> getUser(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<UserEntity>> getUser(@PathVariable UUID id) {
 
-        UUID uid = UUID.fromString(id);
-        UserEntity user = userService.getUserById(uid);
+        UserEntity user = userService.getUserById(id);
         return ResponseEntity.ok(ResponseUtil.success(user, "User extracted successfully!", "/"));
 
     }

@@ -23,7 +23,10 @@ public class CommentEntity {
     @Column(nullable = false)
     private UUID id;
 
-    @Column(name = "author_id")
+    @Column(name = "post_id", insertable = false, updatable = false)
+    private UUID postId;
+
+    @Column(name = "author_id", insertable = false, updatable = false)
     private UUID authorId;
 
     @Column(name = "parent_comment_id")
@@ -40,14 +43,19 @@ public class CommentEntity {
     @JoinColumn(name = "post_id")
     private PostEntity posts;
 
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    private UserEntity authors;
+
     // Constructor
     public CommentEntity() {
     }
 
-    public CommentEntity(CreateCommentRequest request, PostEntity... post) {
+    public CommentEntity(CreateCommentRequest request, PostEntity post, UserEntity user) {
         this.authorId = request.authorId();
         this.comment = request.comment();
-        this.posts = post.length > 0 ? post[0] : null;
+        this.posts = post;
+        this.authors = user;
     }
 
     // Setters
@@ -82,7 +90,7 @@ public class CommentEntity {
     }
 
     public UUID getPostId() {
-        return posts.getId();
+        return postId;
     }
 
     public UUID getParentCommentId() {

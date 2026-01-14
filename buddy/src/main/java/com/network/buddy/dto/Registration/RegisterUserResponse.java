@@ -12,4 +12,8 @@ public record RegisterUserResponse(String username,
     public RegisterUserResponse(UserEntity user, String token) {
         this(user.getName(), user.getUsername(), user.getEmail(), user.getId(), token);
     }
+
+    public RegisterUserResponse(String name, String email, String id, String password, String username, String token) {
+        this(name, email, username, UUID.fromString(id), token);
+    }
 }

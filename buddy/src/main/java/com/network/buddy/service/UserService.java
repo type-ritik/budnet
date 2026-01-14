@@ -1,7 +1,6 @@
 package com.network.buddy.service;
 
 import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,7 +14,6 @@ import com.network.buddy.repository.UserRepository;
 import com.network.buddy.utils.exception.ResourceNotFoundException;
 import com.network.buddy.utils.exception.ResponseNotFoundException;
 import com.network.buddy.utils.helper.UserValidationUtil;
-
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -160,7 +158,15 @@ public class UserService {
         try {
 
             // Search user by UUID
-            return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found."));
+            UserEntity response = userRepository.findUserById(id);
+
+            if (response.toString().isEmpty() || response == null) {
+                throw new ResourceNotFoundException("User not found with id: " + id);
+            } else {
+                log.info("User found with id: " + id);
+                return response;
+            }
+
         } catch (JwtException e) {
             throw new JwtException("Error: " + e.getLocalizedMessage());
         }
