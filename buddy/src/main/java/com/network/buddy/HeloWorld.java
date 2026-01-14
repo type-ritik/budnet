@@ -6,10 +6,21 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RestController
 public class HeloWorld {
 
+    private final HelloService helloService;
+
+    public HeloWorld(HelloService service) {
+        this.helloService = service;
+    }
+
     @GetMapping("/")
     public String home() {
         return new String(
                 "<div style='display:block'><h1>Hello World!</h1><h2>Welcome @type_ritik</h2></div>");
+    }
+
+    @GetMapping("/hello")
+    public String hello() {
+        return helloService.sayHello();
     }
 
     @GetMapping("/health")
