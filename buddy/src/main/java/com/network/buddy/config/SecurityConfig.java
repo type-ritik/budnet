@@ -31,7 +31,7 @@ public class SecurityConfig {
 
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
-                        auth -> auth.requestMatchers("/api/auth/**").permitAll().requestMatchers("/api/public/**")
+                        auth -> auth.requestMatchers("/api/v1/**").permitAll().requestMatchers("/api/public/**")
                                 .permitAll().requestMatchers("/", "/health").permitAll().anyRequest()
                                 .authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

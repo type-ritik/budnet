@@ -37,7 +37,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String path = req.getServletPath();
 
         // Skip JWT check for public endpoints
-        if (path.startsWith("/api/auth/v1/signup") || path.startsWith("/api/auth/v1/login")
+        if (path.startsWith("/api/v1/auth/signup") || path.startsWith("/api/v1/auth/login")
                 || path.equals("/") || path.equals("/health")) {
             filter.doFilter(req, res);
             return;
