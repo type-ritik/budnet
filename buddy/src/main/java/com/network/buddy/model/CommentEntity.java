@@ -3,7 +3,6 @@ package com.network.buddy.model;
 import java.util.Date;
 import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
-import com.network.buddy.dto.Comment.CreateCommentRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -19,7 +18,7 @@ import jakarta.persistence.Table;
 public class CommentEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false)
     private UUID id;
 
@@ -29,7 +28,7 @@ public class CommentEntity {
     @Column(name = "author_id", insertable = false, updatable = false)
     private UUID authorId;
 
-    @Column(name = "parent_comment_id")
+    @Column(name = "parent_comment_id", insertable = false, updatable = false)
     private UUID parentCommentId;
 
     @Column(nullable = false, name = "comment", columnDefinition = "TEXT")
@@ -43,33 +42,40 @@ public class CommentEntity {
     @JoinColumn(name = "post_id")
     private PostEntity posts;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     private UserEntity authors;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_comment_id")
+    private CommentEntity parentComments;
 
     // Constructor
     public CommentEntity() {
     }
 
-    public CommentEntity(CreateCommentRequest request, PostEntity post, UserEntity user) {
-        this.authorId = request.authorId();
-        this.comment = request.comment();
+    public CommentEntity(String comment, PostEntity post, UserEntity user, CommentEntity _parentComment) {
+        this.comment = comment;
         this.posts = post;
         this.authors = user;
+        this.parentComments = _parentComment;
     }
 
     // Setters
-
-    public void setAuthorId(UUID _authorId) {
-        this.authorId = _authorId;
+    public void setId(UUID _id) {
+        this.id = _id;
     }
 
-    public void setPostId(UUID _postId) {
-        this.posts.setId(_postId);
+    public void setAuthor(UserEntity _author) {
+        this.authors = _author;
     }
 
-    public void setParentCommentId(UUID _parentCommentId) {
-        this.parentCommentId = _parentCommentId;
+    public void setPost(PostEntity _post) {
+        this.posts = _post;
+    }
+
+    public void setParentComments(CommentEntity _parentComment) {
+        this.parentComments = _parentComment;
     }
 
     public void setComment(String _comment) {
@@ -86,15 +92,15 @@ public class CommentEntity {
     }
 
     public UUID getAuthorId() {
-        return authorId;
+        return (authors != null) ? authors.getId() : null;
     }
 
     public UUID getPostId() {
-        return postId;
+        return (posts != null) ? posts.getId() : null;
     }
 
     public UUID getParentCommentId() {
-        return parentCommentId;
+        return (parentComments != null) ? parentComments.getId() : null;
     }
 
     public String getComment() {
@@ -105,7 +111,16 @@ public class CommentEntity {
         return commentedAt;
     }
 
-    public String getPostTitle() {
-        return posts.getTitle();
+    public PostEntity getPosts() {
+        return posts;
     }
+
+    public UserEntity getAuthors() {
+        return authors;
+    }
+
+    public CommentEntity getParentComments() {
+        return parentComments;
+    }
+
 }

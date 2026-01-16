@@ -16,7 +16,7 @@ public record ReadCommentResponse(
     public ReadCommentResponse(CommentEntity comment) {
         this(
                 comment.getId(),
-                comment.getPostTitle(),
+                comment.getPosts().getTitle(),
                 comment.getPostId(),
                 comment.getAuthorId(),
                 comment.getParentCommentId(),

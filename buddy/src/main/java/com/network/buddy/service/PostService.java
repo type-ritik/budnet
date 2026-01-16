@@ -9,7 +9,9 @@ import com.network.buddy.dto.CreatePost.CreatePostRequest;
 import com.network.buddy.dto.CreatePost.CreatePostResponse;
 import com.network.buddy.dto.ReadPost.ReadPostResponse;
 import com.network.buddy.model.PostEntity;
+import com.network.buddy.model.UserEntity;
 import com.network.buddy.repository.PostRepository;
+import com.network.buddy.repository.UserRepository;
 import com.network.buddy.utils.exception.ResourceNotFoundException;
 import com.network.buddy.utils.exception.ResponseNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +23,12 @@ public class PostService {
     @Autowired
     private final PostRepository postRepository;
 
-    public PostService(PostRepository _postRepository) {
+    @Autowired
+    private final UserRepository userRepository;
+
+    public PostService(PostRepository _postRepository, UserRepository _userRepository) {
         this.postRepository = _postRepository;
+        this.userRepository = _userRepository;
     }
 
     public CreatePostResponse makePost(CreatePostRequest post) {
@@ -40,8 +46,10 @@ public class PostService {
 
         log.info("Valid post content");
 
+        UserEntity authorProxy = userRepository.getReferenceById(post.authorId());
+
         PostEntity newPost = new PostEntity();
-        newPost.setAuthorId(post.authorId());
+        newPost.setAuthors(authorProxy);
         newPost.setContent(post.content());
         newPost.setTitle(post.title());
 

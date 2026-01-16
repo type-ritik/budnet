@@ -27,7 +27,7 @@ import jakarta.persistence.Table;
 public class UserEntity implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false)
     private UUID id;
 
@@ -44,6 +44,7 @@ public class UserEntity implements UserDetails {
     private String password;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 5)
     private Role role;
 
     @CreationTimestamp
@@ -88,6 +89,10 @@ public class UserEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public void setId(UUID _id) {
+        this.id = _id;
     }
 
     public void setPassword(String _password) {

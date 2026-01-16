@@ -10,7 +10,11 @@ import com.network.buddy.dto.Comment.CreateCommentRequest;
 import com.network.buddy.dto.Comment.CreateCommentResponse;
 import com.network.buddy.dto.ReadComment.ReadCommentResponse;
 import com.network.buddy.model.CommentEntity;
+import com.network.buddy.model.PostEntity;
+import com.network.buddy.model.UserEntity;
 import com.network.buddy.repository.CommentRepository;
+import com.network.buddy.repository.PostRepository;
+import com.network.buddy.repository.UserRepository;
 import com.network.buddy.utils.exception.ResourceNotFoundException;
 import com.network.buddy.utils.exception.ResponseNotFoundException;
 
@@ -23,8 +27,17 @@ public class CommentService {
     @Autowired
     private final CommentRepository commentRepository;
 
-    public CommentService(CommentRepository _commentRepository) {
+    @Autowired
+    private final UserRepository userRepository;
+
+    @Autowired
+    private final PostRepository postRepository;
+
+    public CommentService(CommentRepository _commentRepository, UserRepository _userRepository,
+            PostRepository _postRepository) {
         this.commentRepository = _commentRepository;
+        this.userRepository = _userRepository;
+        this.postRepository = _postRepository;
     }
 
     public CreateCommentResponse saveComment(CreateCommentRequest request) {
@@ -44,13 +57,17 @@ public class CommentService {
             throw new ResourceNotFoundException("Comment content cannot be empty");
         }
 
+        UserEntity authorsProxy = userRepository.getReferenceById(request.authorId());
+        PostEntity postsProxy = postRepository.getReferenceById(request.postId());
+
         CommentEntity savedComment = new CommentEntity();
-        savedComment.setAuthorId(request.authorId());
+        savedComment.setAuthor(authorsProxy);
         savedComment.setComment(request.comment());
-        savedComment.setPostId(request.postId());
+        savedComment.setPost(postsProxy);
 
         if (request.parentCommentId() == null) {
-            savedComment.setParentCommentId(request.parentCommentId());
+            CommentEntity parentCommentProxy = commentRepository.getReferenceById(request.parentCommentId());
+            savedComment.setParentComments(parentCommentProxy);
         }
 
         try {
