@@ -34,6 +34,12 @@ public class RequestsEntity {
     @Column(nullable = false, name = "requested_at")
     private Date requestedAt;
 
+    @Column(nullable = false, name = "status")
+    private RequestState status;
+
+    @Column(nullable = false, name = "is_request_deleted")
+    private Boolean isRequestDeleted;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "receiver_id")
     private UserEntity receiver;
@@ -63,6 +69,14 @@ public class RequestsEntity {
         this.receiver = _receiver;
     }
 
+    public void setStatus(RequestState _status) {
+        this.status = _status;
+    }
+
+    public void setIsRequestDeleted(boolean _isDeleted) {
+        this.isRequestDeleted = _isDeleted;
+    }
+
     public UUID getId() {
         return id;
     }
@@ -85,6 +99,14 @@ public class RequestsEntity {
 
     public Date getRequestedAt() {
         return requestedAt;
+    }
+
+    public RequestState getStatus() {
+        return this.status;
+    }
+
+    public boolean getIsRequestDeleted() {
+        return this.isRequestDeleted;
     }
 
 }
