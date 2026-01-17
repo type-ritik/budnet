@@ -128,7 +128,7 @@ public class PostService {
         }
 
         try {
-            List<PostEntity> posts = postRepository.findManyByAuthorId(userId);
+            List<PostEntity> posts = postRepository.findByAuthorId(userId);
 
             List<ReadPostResponse> response = posts.stream()
                     .limit(pageSize)

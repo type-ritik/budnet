@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/posts")
 public class PostController {
 
     private final PostService postService;
@@ -30,7 +30,7 @@ public class PostController {
         this.postService = _postService;
     }
 
-    @PostMapping("/posts")
+    @PostMapping("/")
     public ResponseEntity<ApiResponse<CreatePostResponse>> createPost(@Valid @RequestBody CreatePostRequest request) {
 
         log.info("Create Post component hit");
@@ -40,20 +40,20 @@ public class PostController {
         return ResponseEntity.ok(ResponseUtil.success(response, "Post created successfully!", "/"));
     }
 
-    @GetMapping("/posts/{slug}/users/{username}")
+    @GetMapping("/{slug}/users/{username}")
     public ResponseEntity<ApiResponse<ReadPostResponse>> retrievePostByUsernameSlug(@PathVariable String username,
             @PathVariable String slug) {
         var response = postService.readPostByUsernameSlug(username, slug);
         return ResponseEntity.ok(ResponseUtil.success(response, "Retrieve post successfully", "/"));
     }
 
-    @GetMapping("/posts/{postId}")
+    @GetMapping("/{postId}")
     public ResponseEntity<ApiResponse<ReadPostResponse>> retrievePostByPostId(@PathVariable UUID postId) {
         var response = postService.readPostByPostId(postId);
         return ResponseEntity.ok(ResponseUtil.success(response, "Retrieve post successfully", "/"));
     }
 
-    @GetMapping("/posts/users/{userId}")
+    @GetMapping("/users/{userId}")
     public ResponseEntity<ApiResponse<List<ReadPostResponse>>> retrievePostsByUserId(@PathVariable UUID userId,
             @RequestParam(defaultValue = "5") int pageSize) {
         List<ReadPostResponse> response = postService.readPostsByUserId(userId, pageSize);

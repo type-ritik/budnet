@@ -10,9 +10,7 @@ import com.network.buddy.model.PostEntity;
 @Repository
 public interface PostRepository extends JpaRepository<PostEntity, UUID> {
 
-    PostEntity findByAuthorId(UUID authorId);
-
-    List<PostEntity> findManyByAuthorId(UUID authorId);
+    List<PostEntity> findByAuthorId(UUID authorId);
 
     @Query(value = """
             SELECT p.* FROM posts p

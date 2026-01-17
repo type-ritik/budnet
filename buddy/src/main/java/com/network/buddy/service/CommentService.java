@@ -91,7 +91,7 @@ public class CommentService {
         log.info("Hit the service of comments");
 
         try {
-            List<CommentEntity> payload = commentRepository.findManyCommentByAuthorId(userId);
+            List<CommentEntity> payload = commentRepository.findCommentByAuthorId(userId);
 
             List<ReadCommentResponse> response = payload.stream().map(ReadCommentResponse::new).toList();
             if (response.isEmpty()) {
@@ -120,7 +120,7 @@ public class CommentService {
         }
 
         try {
-            List<CommentEntity> payload = commentRepository.findManyCommentByAuthorIdAndPostId(userId, postId);
+            List<CommentEntity> payload = commentRepository.findCommentByAuthorIdAndPostId(userId, postId);
 
             if (payload.isEmpty()) {
                 log.error("No comments found for userId: {} in postId: {}", userId, postId);
