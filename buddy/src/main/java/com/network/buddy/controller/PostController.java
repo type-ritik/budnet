@@ -40,7 +40,7 @@ public class PostController {
         return ResponseEntity.ok(ResponseUtil.success(response, "Post created successfully!", "/"));
     }
 
-    @GetMapping("user/{username}/posts/{slug}")
+    @GetMapping("/posts/{slug}/users/{username}")
     public ResponseEntity<ApiResponse<ReadPostResponse>> retrievePostByUsernameSlug(@PathVariable String username,
             @PathVariable String slug) {
         var response = postService.readPostByUsernameSlug(username, slug);
@@ -53,7 +53,7 @@ public class PostController {
         return ResponseEntity.ok(ResponseUtil.success(response, "Retrieve post successfully", "/"));
     }
 
-    @GetMapping("/user/{userId}/posts")
+    @GetMapping("/posts/users/{userId}")
     public ResponseEntity<ApiResponse<List<ReadPostResponse>>> retrievePostsByUserId(@PathVariable UUID userId,
             @RequestParam(defaultValue = "5") int pageSize) {
         List<ReadPostResponse> response = postService.readPostsByUserId(userId, pageSize);

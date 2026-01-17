@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/auth")
 public class UserController {
 
     private final UserService userService;
@@ -33,7 +33,7 @@ public class UserController {
         this.userService = _userService;
     }
 
-    @PostMapping("/auth/signup")
+    @PostMapping("/signup")
     public ResponseEntity<ApiResponse<RegisterUserResponse>> signup(@Valid @RequestBody RegisterUserRequest request) {
         log.info("Signup component hit");
         RegisterUserResponse response = userService.registerUser(request);
@@ -43,7 +43,7 @@ public class UserController {
 
     }
 
-    @GetMapping("/user/{id}")
+    @GetMapping("/users/{id}")
     public ResponseEntity<ApiResponse<UserEntity>> getUser(@PathVariable UUID id) {
 
         UserEntity user = userService.getUserById(id);
@@ -51,7 +51,7 @@ public class UserController {
 
     }
 
-    @PostMapping("/auth/login")
+    @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthenticateUserResponse>> login(
             @Valid @RequestBody AuthenticateUserRequest request) {
 
