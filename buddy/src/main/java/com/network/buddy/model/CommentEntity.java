@@ -28,7 +28,7 @@ public class CommentEntity {
     @Column(name = "author_id", insertable = false, updatable = false)
     private UUID authorId;
 
-    @Column(name = "parent_comment_id", insertable = false, updatable = false)
+    @Column(name = "parent_comment_id", insertable = false, updatable = false, nullable = true)
     private UUID parentCommentId;
 
     @Column(nullable = false, name = "comment", columnDefinition = "TEXT")
@@ -47,7 +47,7 @@ public class CommentEntity {
     private UserEntity authors;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_comment_id")
+    @JoinColumn(name = "parent_comment_id", nullable = true)
     private CommentEntity parentComments;
 
     // Constructor

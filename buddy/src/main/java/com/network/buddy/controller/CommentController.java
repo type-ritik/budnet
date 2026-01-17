@@ -32,10 +32,11 @@ public class CommentController {
         this.commentService = _commentService;
     }
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<ApiResponse<CreateCommentResponse>> createComment(
             @Valid @RequestBody CreateCommentRequest request) {
         log.info("Create comment API hit");
+
         CreateCommentResponse response = commentService.saveComment(request);
         log.info("Create comment API end");
         return ResponseEntity.ok(ResponseUtil.success(response, "Comment created successfully", "/"));

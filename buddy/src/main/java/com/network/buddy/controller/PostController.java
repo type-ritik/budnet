@@ -30,7 +30,7 @@ public class PostController {
         this.postService = _postService;
     }
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<ApiResponse<CreatePostResponse>> createPost(@Valid @RequestBody CreatePostRequest request) {
 
         log.info("Create Post component hit");

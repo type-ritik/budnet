@@ -58,6 +58,7 @@ public class CommentService {
         }
 
         UserEntity authorsProxy = userRepository.getReferenceById(request.authorId());
+
         PostEntity postsProxy = postRepository.getReferenceById(request.postId());
 
         CommentEntity savedComment = new CommentEntity();
@@ -65,14 +66,14 @@ public class CommentService {
         savedComment.setComment(request.comment());
         savedComment.setPost(postsProxy);
 
-        if (request.parentCommentId() == null) {
+        if (request.parentCommentId() != null) {
             CommentEntity parentCommentProxy = commentRepository.getReferenceById(request.parentCommentId());
             savedComment.setParentComments(parentCommentProxy);
         }
 
         try {
-
             CommentEntity createdComment = commentRepository.save(savedComment);
+
             CreateCommentResponse response = new CreateCommentResponse(createdComment);
             return response;
         } catch (ResponseNotFoundException e) {
