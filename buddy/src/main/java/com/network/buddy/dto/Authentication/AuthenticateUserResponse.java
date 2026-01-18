@@ -2,8 +2,6 @@ package com.network.buddy.dto.Authentication;
 
 import java.util.UUID;
 
-import java.util.UUID;
-
 import com.network.buddy.model.UserEntity;
 
 public record AuthenticateUserResponse(
