@@ -12,6 +12,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import com.network.buddy.service.JwtService;
 import com.network.buddy.service.UserService;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,8 +37,8 @@ public class JwtFilter extends OncePerRequestFilter {
         String path = req.getServletPath();
 
         // Skip JWT check for public endpoints
-        if (path.startsWith("/api/auth/v1/signup") || path.startsWith("/api/auth/v1/login")
-                || path.equals("/api/public")) {
+        if (path.startsWith("/api/v1/auth/signup") || path.startsWith("/api/v1/auth/login")
+                || path.equals("/") || path.equals("/health")) {
             filter.doFilter(req, res);
             return;
         }
@@ -45,21 +46,36 @@ public class JwtFilter extends OncePerRequestFilter {
         // For other endpoints, check JWT
         String authHeader = req.getHeader("Authorization");
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            String username = jwtService.extractUsername(token);
+        try {
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
+                String username = jwtService.extractUsername(token);
 
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails user = userService.loadUserByUsername(username);
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UserDetails user = userService.loadUserByUsername(username);
 
-                if (jwtService.isTokenValide(token, user)) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(user,
-                            null, user.getAuthorities());
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    if (jwtService.isTokenValide(token, user)) {
+
+                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(user,
+                                null, user.getAuthorities());
+                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    }
                 }
+                filter.doFilter(req, res);
             }
-            filter.doFilter(req, res);
+        } catch (ServletException e) {
+            log.error("JWT Filter Servlet error: " + e.getMessage());
+            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            res.getWriter().write("Unauthorized: " + e.getMessage());
+        } catch (IOException e) {
+            log.error("JWT Filter IOException error: " + e.getMessage());
+            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            res.getWriter().write("Unauthorized: " + e.getMessage());
+        } catch (JwtException e) {
+            log.error("JWT processing JWT error: " + e.getMessage());
+            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            res.getWriter().write("Unauthorized: Invalid JWT token");
         }
     }
 }

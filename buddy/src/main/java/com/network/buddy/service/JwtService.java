@@ -4,6 +4,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -37,6 +38,16 @@ public class JwtService {
         return extractAllClaims(token).getSubject();
     }
 
+    public UUID extractId(String token) {
+        Object idClaim = extractAllClaims(token).get("id");
+        if (idClaim == null) {
+            log.error("ID claim is missing in the token");
+            throw new RuntimeException("ID claim is missing in the token");
+        } else {
+            return UUID.fromString(idClaim.toString());
+        }
+    }
+
     public Date extractExpiration(String token) {
         return extractAllClaims(token).getExpiration();
     }
@@ -47,9 +58,13 @@ public class JwtService {
     }
 
     private String createToken(Map<String, Object> claims, String username) {
-        return Jwts.builder().setClaims(claims).setSubject(username).setIssuedAt(new Date(System.currentTimeMillis()))
+        return Jwts.builder()
+                .setClaims(claims) // Set the custom map first
+                .setSubject(username) // Standard claim 'sub'
+                .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
+                .signWith(getSignKey(), SignatureAlgorithm.HS256)
+                .compact();
     }
 
     public String generateToken(UserEntity user) {
