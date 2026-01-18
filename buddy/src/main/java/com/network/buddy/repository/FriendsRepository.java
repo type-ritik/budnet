@@ -18,5 +18,5 @@ public interface FriendsRepository extends JpaRepository<FriendsEntity, UUID> {
     List<FriendsEntity> findByFriendBIdAndIsFriendshipDeletedIsFalse(UUID friendBId);
 
     // Following and Not deleted
-    List<FriendsEntity> findByFriendAIdAndIsFriendshipDeletedIsTrue(UUID friendAId);
+    List<FriendsEntity> findByFriendAIdAndIsFriendshipDeletedIsFalse(UUID friendAId);
 }

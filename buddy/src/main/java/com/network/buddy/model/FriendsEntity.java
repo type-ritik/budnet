@@ -24,10 +24,10 @@ public class FriendsEntity {
     @Column(nullable = false)
     private UUID id;
 
-    @Column(nullable = false, insertable = false, updatable = false, name = "friend_A_id")
+    @Column(nullable = false, insertable = false, updatable = false, name = "friend_a_id")
     private UUID friendAId;
 
-    @Column(nullable = false, insertable = false, updatable = false, name = "friend_B_id")
+    @Column(nullable = false, insertable = false, updatable = false, name = "friend_b_id")
     private UUID friendBId;
 
     @Column(nullable = false, insertable = false, updatable = false, name = "request_id")
@@ -41,11 +41,11 @@ public class FriendsEntity {
     private Boolean isFriendshipDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "friend_A_id")
+    @JoinColumn(name = "friend_a_id")
     private UserEntity friendA;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "friend_B_id")
+    @JoinColumn(name = "friend_b_id")
     private UserEntity friendB;
 
     @ManyToOne(fetch = FetchType.LAZY)
