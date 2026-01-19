@@ -43,6 +43,12 @@ public class FriendsService {
             log.error("Invalid SenderId: " + request.senderId());
             throw new ResourceNotFoundException("Illigal UserId");
         }
+
+        if (request.senderId().equals(request.receiverId())) {
+            log.error("SenderId and ReceiverId cannot be the same: " + request.senderId());
+            throw new ResourceNotFoundException("SenderId and ReceiverId cannot be the same");
+        }
+
         if (!UserValidationUtil.validateUUID(request.receiverId())) {
             log.error("Invalid ReceiverId: " + request.receiverId());
             throw new ResourceNotFoundException("Illigal receiverId");
