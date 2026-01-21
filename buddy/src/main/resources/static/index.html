@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Test</title>
+</head>
+<body>
+    <h1>WebSocket Example</h1>
+    <button onclick="sendMessage()">Send Message</button>
+<script>
+    const sendMessage = () => {
+const ws = new WebSocket("ws://localhost:8080/buddy");
+
+        ws.addEventListener("open", (event) => {
+        ws.send(`CONNECT\naccept-version:1.1\nhost:localhost\n\n\u0000`);
+            console.log("Message sent to server");
+        })
+
+        ws.addEventListener("message", (event) => {
+            console.log("Message from server ", event);
+        })
+    }
+</script>
+</body>
+</html>
