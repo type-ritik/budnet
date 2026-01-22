@@ -7,19 +7,110 @@
 </head>
 <body>
     <h1>WebSocket Example</h1>
-    <button onclick="sendMessage()">Send Message</button>
+    <button onclick="sendMessage('/app/chat.send', 'Hello World')">I Send Message</button>
 <script>
-    const sendMessage = () => {
-const ws = new WebSocket("ws://localhost:8080/buddy");
 
-        ws.addEventListener("open", (event) => {
-        ws.send(`CONNECT\naccept-version:1.1\nhost:localhost\n\n\u0000`);
-            console.log("Message sent to server");
-        })
+    function buildFrame(command, headers = {}, body = "") {
+        let frame = command + "\n";
+        for (const key in headers) {
+            frame += `${key}:${headers[key]}\n`;
+        }
 
-        ws.addEventListener("message", (event) => {
-            console.log("Message from server ", event);
-        })
+        frame += "\n";
+        frame += body;
+        frame += "\u0000";
+        return frame;
+    }
+
+    function parseFrame(raw) {
+        const [headerPart, bodyPart] = raw.split("\n\n");
+        const lines = headerPart.split("\n");
+        const command = lines[0];
+
+        const headers = {};
+        for (let i = 1; i < lines.length; i++) {
+            const [k,v] = lines[i].split(":");
+            headers[k] = v;
+        }
+
+        return {
+            command, headers, body: bodyPart?.replace("\u0000", "")
+        };
+    }
+
+    const STATE = {
+        DISCONNECTED: "DISCONNECTED",
+        CONNECTING: "CONNECTING",
+        CONNECTED: "CONNECTED",
+        SUBSCRIBED: "SUBSCRIBED"
+    };
+
+    let state = STATE.DISCONNECTED;
+
+    const ws = new WebSocket("ws://localhost:8080/buddy");
+
+    ws.onopen = () => {
+        state = STATE.CONNECTING;
+        ws.send(buildFrame("CONNECT", {
+            "accept-version": "1.2",
+            host:"localhost"
+        }));
+    };
+
+    ws.onmessage = (event) => {
+        console.log("I receive message everytime i hit server event",event);
+        const frame = parseFrame(event.data);
+        routeFrame(frame);
+    }
+
+    ws.onclose = () => {
+        state = STATE.DISCONNECTED;
+        console.log("Disconnected");
+    }
+
+    function routeFrame(frame) {
+        switch (frame.command) {
+            case "CONNECTED":
+                state = STATE.CONNECTED;
+                subscribe("/topic/messages");
+                break;
+
+            case "SUBSCRIBED":
+                console.log("Subscribed successfully");
+                break;
+
+            case "MESSAGE":
+                console.log("Received message:", frame.body);
+                break;
+
+            case "ERROR":
+                console.log("STOMP ERROR: ", frame);
+                break;
+
+            default:
+                console.warn("Unknown frame: ", frame);
+                break;
+        }
+    }
+
+    function subscribe(destination) {
+        if (state !== STATE.CONNECTED) return;
+
+        ws.send(buildFrame("SUBSCRIBE", {
+            id: "sub-1",
+            destination
+        }));
+
+        state = STATE.SUBSCRIBED;
+    }
+
+    function sendMessage(destination, message) {
+        if (state !== STATE.SUBSCRIBED) return;
+
+        ws.send(buildFrame("SEND", {
+            destination,
+            "content-type": "text/plain"
+        }, message));
     }
 </script>
 </body>
