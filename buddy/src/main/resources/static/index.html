@@ -7,8 +7,38 @@
 </head>
 <body>
     <h1>WebSocket Example</h1>
-    <button onclick="sendMessage('/app/chat.send', 'Hello World')">I Send Message</button>
+    <button onclick="sendMessage('/app/chat.send', 'Hello World', 'text/plain')">I Send Message</button>
+    <input placeholder="Enter any text" id="inputed" />
+    <input placeholder="Enter receiverId" id="receiver"/>
+    <button onclick="sendToUser()">Chat On</button>
 <script>
+
+    const input = document.getElementById("inputed");
+    const receiver = document.getElementById("receiver");
+
+    const sendToUser = () => {
+        const message = input.value;
+        const id = receiver.value;
+        const payload = {
+            message,
+            receiverId: id
+        }
+
+        ws.send(`SEND\ndestination:/app/chat.online\ncontent-type:application/json\n\n${JSON.stringify(payload)}\u0000`)
+
+        // sendMessage(`/app/chat.online`, {message: message, receiverId: id}, 'application/json');
+    }
+
+    const randomUUID = async () => {
+        const res = await fetch("http://localhost:8080/uuid/random", {
+            method: "GET"
+        });
+        if (res.ok) {
+            const data = await res.text();
+            console.log(`UserId: ${data}`);
+            return data;
+        }
+    }
 
     function buildFrame(command, headers = {}, body = "") {
         let frame = command + "\n";
@@ -68,11 +98,12 @@
         console.log("Disconnected");
     }
 
-    function routeFrame(frame) {
+    async function routeFrame(frame) {
         switch (frame.command) {
             case "CONNECTED":
                 state = STATE.CONNECTED;
-                subscribe("/topic/messages");
+                const uuid = await randomUUID();
+                subscribe(["/user/queue/messages", "/topic/messages"], uuid);
                 break;
 
             case "SUBSCRIBED":
@@ -93,23 +124,36 @@
         }
     }
 
-    function subscribe(destination) {
+    function subscribe(destination, uuid) {
         if (state !== STATE.CONNECTED) return;
 
-        ws.send(buildFrame("SUBSCRIBE", {
-            id: "sub-1",
-            destination
-        }));
+        if (destination.length == 0) {
+            console.warn("No destinations provided for subscription");
+            return;
+        } else if(destination.length == 1) {
+            ws.send(buildFrame("SUBSCRIBE", {
+                id: uuid,
+                destination
+            }));
+        } else {
+            destination.forEach(dest => {
+                ws.send(buildFrame("SUBSCRIBE", {
+                    id: uuid,
+                    destination: dest
+                }));
+            });
+        }
+
 
         state = STATE.SUBSCRIBED;
     }
 
-    function sendMessage(destination, message) {
+    function sendMessage(destination, message, type) {
         if (state !== STATE.SUBSCRIBED) return;
 
         ws.send(buildFrame("SEND", {
             destination,
-            "content-type": "text/plain"
+            "content-type": type
         }, message));
     }
 </script>

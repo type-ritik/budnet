@@ -20,7 +20,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         log.info("Web socket endpoint init");
-        registry.addEndpoint("/buddy").setAllowedOrigins("https://websocketking.com");
+        registry.addEndpoint("/buddy").
+                .setHandshakeHandler(new CustomHandshakeHandler());
     }
 
     @Override
@@ -38,7 +39,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry config) {
         log.info("Message broker endpoint also init");
         config.setApplicationDestinationPrefixes("/app");
-        config.enableSimpleBroker("/topic");
+        config.enableSimpleBroker("/topic", "/queue");
+        config.setUserDestinationPrefix("/user");
     }
 
 }

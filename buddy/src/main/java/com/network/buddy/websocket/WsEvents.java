@@ -38,9 +38,10 @@ public class WsEvents {
     @EventListener
     public void onSubscribe(SessionSubscribeEvent e) {
         UUID sessionId = UUID.fromString(e.getMessage().getHeaders().get("simpSessionId").toString());
-        String userId = e.getMessage().getHeaders().get("simpSubscriptionId").toString();
-        // UUID userId =
-        // UUID.fromString(e.getMessage().getHeaders().get("simpSubscriptionId").toString());
+        // String userId =
+        // e.getMessage().getHeaders().get("simpSubscriptionId").toString();
+        UUID userId = UUID.fromString(e.getMessage().getHeaders().get("simpSubscriptionId").toString());
+        System.out.println("UUID: " + userId);
         rememberUser.setNewSubscription(userId, sessionId);
         System.out.println("Subscribed");
     }
