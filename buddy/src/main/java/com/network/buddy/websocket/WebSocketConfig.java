@@ -20,7 +20,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         log.info("Web socket endpoint init");
-        registry.addEndpoint("/buddy").
+        registry.addEndpoint("/buddy")
                 .setHandshakeHandler(new CustomHandshakeHandler());
     }
 
