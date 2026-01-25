@@ -1,7 +1,6 @@
 package com.network.buddy.websocket;
 
 import java.security.Principal;
-
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -24,9 +23,10 @@ public class ChatMessagesController {
     }
 
     @MessageMapping("/chat.online")
-    public void online(ChatMessage message, Principal princial) {
+    public void online(ChatMessage message, Principal principal) {
         System.out.println("HELLO MYSELF NEW");
         System.out.println("Message: " + message.getMessage() + " Receiver: " + message.getReceiverId());
-        simpMessagingTemplate.convertAndSendToUser(princial.getName(), "/queue/messages", message.getMessage());
+        System.out.println("Principal data: " + principal.getName());
+        simpMessagingTemplate.convertAndSendToUser(message.getReceiverId(), "/queue/messages", message.getMessage());
     }
 }

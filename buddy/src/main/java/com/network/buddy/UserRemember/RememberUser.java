@@ -6,12 +6,12 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RememberUser {
-    private ConcurrentHashMap<String, UUID> registerUser = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<UUID, UUID> registerUser = new ConcurrentHashMap<>();
 
     public RememberUser() {
     }
 
-    public void setNewSubscription(String userId, UUID sessionId) {
+    public void setNewSubscription(UUID userId, UUID sessionId) {
         if (this.registerUser.containsKey(userId)) {
             registerUser.replace(userId, sessionId);
         } else {
@@ -19,22 +19,22 @@ public class RememberUser {
         }
     }
 
-    public void setRemoveSubscription(String userId, UUID sessionId) {
+    public void setRemoveSubscription(UUID userId, UUID sessionId) {
         if (this.registerUser.containsKey(userId)) {
             this.registerUser.remove(userId, sessionId);
         }
     }
 
-    public UUID getSessionIdByUserId(String userId) {
+    public UUID getSessionIdByUserId(UUID userId) {
         if (this.registerUser.containsKey(userId)) {
             return this.registerUser.get(userId);
         }
         return null;
     }
 
-    public String getUserIdBySessionId(UUID sessionId) {
+    public UUID getUserIdBySessionId(UUID sessionId) {
         if (this.registerUser.containsValue(sessionId)) {
-            for (String key : this.registerUser.keySet()) {
+            for (UUID key : this.registerUser.keySet()) {
                 if (this.registerUser.get(key).equals(sessionId)) {
                     return key;
                 }
